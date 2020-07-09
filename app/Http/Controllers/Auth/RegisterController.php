@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Storage;
-use Store;
 
 class RegisterController extends Controller
 {
@@ -96,9 +96,16 @@ class RegisterController extends Controller
             $upload = $request->file('avatar')->store('avatars');
 
             $user->avatar = $upload;
-        } 
+        } else {
+            $user->avatar = null;
+        }
         
         $user->save();
+
+        Auth::attempt([
+            'email' => $user->email,
+            'password' => $user->senha
+        ]);
 
         return redirect('/home');
     }
